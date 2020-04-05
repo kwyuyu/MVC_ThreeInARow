@@ -1,14 +1,8 @@
 package view.Utils;
 
-import javax.swing.*;
 
-public class TextArea extends JTextArea {
+public abstract class TextArea {
 
-    public TextArea() {
-
-    }
-
-    public void setTextArea(String text) {
-        this.setText(text);
-    }
+    public abstract void setTextArea(String text);
+    public abstract String getText();
 }

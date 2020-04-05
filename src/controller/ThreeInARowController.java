@@ -1,8 +1,8 @@
 package controller;
 
-import model.ThreeInARowModel;
+import model.AbstractModel;
 import model.Utils.Player;
-import view.ThreeInARowView;
+import view.AbstractView;
 import view.Utils.BlockButton;
 
 import java.awt.event.ActionEvent;
@@ -10,12 +10,20 @@ import java.awt.event.ActionListener;
 
 public class ThreeInARowController implements AbstractController {
 
-    private int size;
-    private ThreeInARowView view;
-    private ThreeInARowModel model;
+    private static final String DRAW_MESSAGE = "Game ends in a draw!";
 
-    public ThreeInARowController(int size, ThreeInARowView view, ThreeInARowModel model) {
+    private int size;
+    private Player currentPlayer;
+
+    private AbstractView view;
+    private AbstractModel model;
+
+    public boolean debug = false;
+
+    public ThreeInARowController(int size, AbstractView view, AbstractModel model) {
         this.size = size;
+        this.currentPlayer = Player.P1;
+
         this.view = view;
         this.model = model;
 
@@ -36,46 +44,78 @@ public class ThreeInARowController implements AbstractController {
         }
     }
 
+
     @Override
     public void run() {
-        this.view.display();
+        this.view.getGui().setVisible(true);
+    }
+
+    @Override
+    public Player getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    @Override
+    public void switchPlayer() {
+        this.currentPlayer = this.currentPlayer == Player.P2 ? Player.P1 : Player.P2;
+    }
+
+    @Override
+    public String getWinMessage() {
+        return String.format("Player %d wins!", (this.currentPlayer.getId()));
+    }
+
+    @Override
+    public String getNextPlayerMessage() {
+        return String.format("'%s': Player %d", this.currentPlayer.getMarker(), this.currentPlayer.getId());
     }
 
     @Override
     public void move(BlockButton blockButton) {
-        int moveLeft = this.model.takeOneMove();
+        this.model.takeOneMove();
+        int moveLeft = this.model.getMoveLeft();
         int row = blockButton.getRow();
         int col = blockButton.getCol();
-        Player currentPlayer = this.model.getCurrentPlayer();
 
-        this.model.update(row, col);
-        this.view.update(row, col, currentPlayer);
+        this.model.update(row, col, this.currentPlayer);
+        this.view.update(row, col, this.currentPlayer);
 
         if (this.model.checkIsWin()) {
             // win
-            this.view.winGameView(currentPlayer);
+            this.view.endGame();
+            this.view.setPlayerTurnText(this.getWinMessage());
         }
         else if (moveLeft == 0) {
             // draw
-            this.view.drawGameView();
+            this.view.endGame();
+            this.view.setPlayerTurnText(DRAW_MESSAGE);
         }
         else {
-            this.view.switchPlayer(this.model.switchPlayer());
+            if (!this.debug) {
+                this.switchPlayer();
+            }
+            this.view.setPlayerTurnText(this.getNextPlayerMessage());
         }
+    }
+
+    @Override
+    public void resetGame() {
+        this.view.resetGame();
+        this.model.resetGame();
+        this.currentPlayer = Player.P1;
     }
 
     private class ResetButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            view.resetGame();
-            model.resetGame();
+            resetGame();
         }
     }
 
     private class BlockListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            move((BlockButton) e.getSource());
+            move(view.getBlockButton(e));
         }
     }
 }

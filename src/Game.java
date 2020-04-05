@@ -1,5 +1,8 @@
+import controller.AbstractController;
 import controller.ThreeInARowController;
+import model.AbstractModel;
 import model.ThreeInARowModel;
+import view.AbstractView;
 import view.ThreeInARowView;
 
 public class Game {
@@ -7,9 +10,9 @@ public class Game {
     public static void main(String[] args) {
         int size = 3;
 
-        ThreeInARowModel model = new ThreeInARowModel(size);
-        ThreeInARowView view = new ThreeInARowView(size);
-        ThreeInARowController controller = new ThreeInARowController(size, view, model);
+        AbstractModel model = new ThreeInARowModel(size);
+        AbstractView view = new ThreeInARowView(size);
+        AbstractController controller = new ThreeInARowController(size, view, model);
 
         controller.run();
     }

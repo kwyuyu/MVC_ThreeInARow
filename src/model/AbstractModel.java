@@ -1,13 +1,13 @@
 package model;
 
+
 import model.Utils.Player;
 
 public interface AbstractModel {
 
-    Player getCurrentPlayer();
-    int takeOneMove();
-    Player switchPlayer();
-    void update(int row, int col);
+    void takeOneMove();
+    int getMoveLeft();
+    void update(int row, int col, Player player);
     boolean checkIsWin();
     void resetGame();
 }

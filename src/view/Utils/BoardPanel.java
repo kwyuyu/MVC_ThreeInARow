@@ -1,20 +1,14 @@
 package view.Utils;
 
-import javax.swing.*;
+
 import java.awt.*;
 
-public class BoardPanel extends JPanel {
+public abstract class BoardPanel {
 
-    public BoardPanel() {
-
-    }
-
-    public BoardPanel(FlowLayout flowLayout) {
-        super(flowLayout);
-    }
-
-    public BoardPanel(GridLayout gridLayout) {
-        super(gridLayout);
-    }
+    public abstract void add(BoardPanel boardPanel, String borderLayout);
+    public abstract void add(ResetButton button);
+    public abstract void add(BlockButton button);
+    public abstract void add(TextArea textArea);
+    public abstract void setBackground(Color color);
 
 }

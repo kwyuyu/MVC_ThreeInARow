@@ -1,6 +1,5 @@
 package model;
 
-import model.Utils.BlockData;
 import model.Utils.Player;
 
 import java.util.Arrays;
@@ -11,8 +10,6 @@ public class ThreeInARowModel implements AbstractModel {
 
     private int size;
     private int moveLeft;
-    private Player currentPlayer = Player.P1;
-    private BlockData[][] blockData;
 
     private Map<Player, int[]> rowCache = new HashMap<>();
     private Map<Player, int[]> colCache = new HashMap<>();
@@ -24,19 +21,9 @@ public class ThreeInARowModel implements AbstractModel {
     public ThreeInARowModel(int size) {
         this.size = size;
         this.moveLeft = this.size * this.size;
-        this.blockData = new BlockData[this.size][this.size];
 
-        this.blockDataInitialize();
         this.cacheInitialize();
 
-    }
-
-    private void blockDataInitialize() {
-        for (int row = 0; row < this.size; row++) {
-            for (int col = 0; col < this.size; col++) {
-                this.blockData[row][col] = new BlockData(row, col);
-            }
-        }
     }
 
     private void cacheInitialize() {
@@ -60,43 +47,37 @@ public class ThreeInARowModel implements AbstractModel {
     }
 
     @Override
-    public Player getCurrentPlayer() {
-        return this.currentPlayer;
+    public void takeOneMove() {
+        --this.moveLeft;
     }
 
     @Override
-    public int takeOneMove() {
-        return --this.moveLeft;
+    public int getMoveLeft() {
+        return this.moveLeft;
     }
 
     @Override
-    public Player switchPlayer() {
-        this.currentPlayer = this.currentPlayer == Player.P2 ? Player.P1 : Player.P2;
-        return this.currentPlayer;
-    }
-
-    @Override
-    public void update(int row, int col) {
+    public void update(int row, int col, Player player) {
         // diagonal
         if (row == col) {
-            this.diagCache.put(this.currentPlayer, this.diagCache.get(this.currentPlayer) + 1);
+            this.diagCache.put(player, this.diagCache.get(player) + 1);
         }
 
         // anti-diagonal
         if (row + col + 1 == this.size) {
-            this.antiDiagCache.put(this.currentPlayer, this.antiDiagCache.get(this.currentPlayer) + 1);
+            this.antiDiagCache.put(player, this.antiDiagCache.get(player) + 1);
         }
 
         // row
-        this.rowCache.get(this.currentPlayer)[row] += 1;
+        this.rowCache.get(player)[row] += 1;
 
         // col
-        this.colCache.get(this.currentPlayer)[col] += 1;
+        this.colCache.get(player)[col] += 1;
 
-        if (this.diagCache.get(this.currentPlayer) == this.size ||
-            this.antiDiagCache.get(this.currentPlayer) == this.size ||
-            this.rowCache.get(this.currentPlayer)[row] == this.size ||
-            this.colCache.get(this.currentPlayer)[col] == this.size) {
+        if (this.diagCache.get(player) == this.size ||
+            this.antiDiagCache.get(player) == this.size ||
+            this.rowCache.get(player)[row] == this.size ||
+            this.colCache.get(player)[col] == this.size) {
             this.someoneWin = true;
         }
     }
@@ -108,7 +89,6 @@ public class ThreeInARowModel implements AbstractModel {
 
     @Override
     public void resetGame() {
-        this.currentPlayer = Player.P1;
         this.moveLeft = this.size * this.size;
         this.someoneWin = false;
         this.cacheInitialize();

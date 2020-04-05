@@ -1,18 +1,11 @@
 package view.Utils;
 
-import javax.swing.*;
-import java.awt.*;
 
-public class BoardFrame extends JFrame {
+public abstract class BoardFrame {
 
-    public BoardFrame() {
-        super();
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setResizable(true);
-    }
-
-    public void setFrameSize(int width, int height) {
-        this.setSize(new Dimension(width, height));
-    }
+    public abstract void setFrameSize(int width, int height);
+    public abstract void setResizeable(boolean bool);
+    public abstract void setVisible(boolean bool);
+    public abstract void add(BoardPanel boardPanel, String borderLayout);
 
 }

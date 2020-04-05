@@ -1,12 +1,11 @@
 package view;
 
 import model.Utils.Player;
-import view.Utils.BlockButton;
-import view.Utils.BoardFrame;
-import view.Utils.BoardPanel;
+import view.Utils.*;
 import view.Utils.TextArea;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ThreeInARowView implements AbstractView {
@@ -14,27 +13,28 @@ public class ThreeInARowView implements AbstractView {
     private int size;
 
     private BlockButton[][] blocks;
-    private BlockButton resetButton = new BlockButton("Reset");
+    private ResetButton resetButton = new ResetButtonSwing("Reset");
 
     private BoardPanel game;
-    private BoardFrame gui = new BoardFrame();
+    private BoardFrame gui = new BoardFrameSwing();
 
-    private TextArea playerTurn = new TextArea();
+    private TextArea playerTurn = new TextAreaSwing();
 
 
     public ThreeInARowView(int size) {
         this.size = size;
         this.blocks = new BlockButton[this.size][this.size];
-        this.gui.setSize(100 * this.size, 100 * this.size + 30);
+        this.gui.setFrameSize(100 * this.size, 100 * this.size + 30);
+        this.gui.setResizeable(true);
 
-        BoardPanel gamePanel = new BoardPanel(new FlowLayout());
-        this.game = new BoardPanel(new GridLayout(this.size, this.size));
+        BoardPanel gamePanel = new BoardPanelSwing(new FlowLayout());
+        this.game = new BoardPanelSwing(new GridLayout(this.size, this.size));
         gamePanel.add(this.game, BorderLayout.CENTER);
 
-        BoardPanel options = new BoardPanel(new FlowLayout());
+        BoardPanel options = new BoardPanelSwing(new FlowLayout());
         options.add(this.resetButton);
 
-        BoardPanel messages = new BoardPanel(new FlowLayout());
+        BoardPanel messages = new BoardPanelSwing(new FlowLayout());
         messages.setBackground(Color.white);
 
         this.gui.add(gamePanel, BorderLayout.NORTH);
@@ -50,7 +50,7 @@ public class ThreeInARowView implements AbstractView {
     private void blocksInitialize() {
         for (int row = 0; row < this.size; row++) {
             for (int col = 0; col < this.size; col++) {
-                this.blocks[row][col] = new BlockButton(row, col);
+                this.blocks[row][col] = new BlockButtonSwing(row, col);
                 this.blocks[row][col].setButtonSize(75, 75);
                 this.game.add(this.blocks[row][col].getBlockButton());
             }
@@ -58,9 +58,27 @@ public class ThreeInARowView implements AbstractView {
     }
 
 
+
     @Override
-    public void display() {
-        this.gui.setVisible(true);
+    public BoardFrame getGui() {
+        return this.gui;
+    }
+
+    @Override
+    public BlockButton getBlockButton(int row, int col) {
+        return this.blocks[row][col].getBlockButton();
+    }
+
+    @Override
+    public BlockButton getBlockButton(ActionEvent e) {
+        for (int row = 0; row < this.size; row++) {
+            for (int col = 0; col < this.size; col++) {
+                if (this.blocks[row][col].isEqualButton(e)) {
+                    return this.blocks[row][col].getBlockButton();
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -81,24 +99,22 @@ public class ThreeInARowView implements AbstractView {
     }
 
     @Override
-    public void switchPlayer(Player player) {
-        this.playerTurn.setTextArea(String.format("'%s'L Player %d", player.getMarker(), player.getId()));
+    public String getPlayerTurnText() {
+        return this.playerTurn.getText();
     }
 
     @Override
-    public void winGameView(Player player) {
-        this.playerTurn.setTextArea(String.format("Player %d wins!", (player.getId())));
+    public void setPlayerTurnText(String text) {
+        this.playerTurn.setTextArea(text);
+    }
 
+    @Override
+    public void endGame() {
         for (int row = 0; row < this.size; row++) {
             for (int col = 0; col < this.size; col++) {
                 this.blocks[row][col].setButtonEnabled(false);
             }
         }
-    }
-
-    @Override
-    public void drawGameView() {
-        this.playerTurn.setTextArea("Game ends in a draw!");
     }
 
     @Override
